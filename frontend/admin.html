@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Colby Security</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* Toggle Switch Style */
+        .toggle-wrapper { display: flex; gap: 10px; margin: 10px 0; font-size: 12px; align-items: center; color: var(--text-secondary); }
+        .toggle-btn { cursor: pointer; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); background: transparent; }
+        .toggle-btn.active { background: var(--text-primary); color: white; border-color: var(--text-primary); }
+        
+        /* Delete Button */
+        .delete-btn { color: #ff3b30; border-color: #ff3b30; margin-top: auto;}
+        .delete-btn:hover { background: #ff3b30; color: white; }
+        
+        /* Section Divider */
+        .section-divider { margin: 60px 0 20px 0; border-top: 1px solid var(--border); padding-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <h1>Colby Security</h1>
+                <p class="subtitle">Upload photos, review, and manage inventory.</p>
+            </div>
+            <a href="index.html" target="_blank" class="action-btn" style="text-decoration: none; display: inline-block;">
+                View Student Page &rarr;
+            </a>
+        </header>
+
+        <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+            <input type="file" id="fileInput" multiple accept="image/*" style="font-family: var(--font-main);">
+            <button id="uploadBtn" class="publish-btn" style="background: black; color: white;">Analyze Batch</button>
+            <button id="clearBtn" class="action-btn" style="border: none; color: var(--text-secondary);">Clear All</button>
+        </div>
+
+        <div id="stagingGrid" class="grid"></div>
+
+        <div class="section-divider">
+            <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 20px;">Manage Published Items</h2>
+        </div>
+        <div id="publishedGrid" class="grid"></div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const stagingGrid = document.getElementById('stagingGrid');
+        const publishedGrid = document.getElementById('publishedGrid');
+
+        // 1. Analyze Batch
+        uploadBtn.addEventListener('click', async () => {
+            if (fileInput.files.length === 0) return alert("Select images first");
+            uploadBtn.textContent = "Processing...";
+            uploadBtn.disabled = true;
+
+            const formData = new FormData();
+            for (const file of fileInput.files) formData.append('files', file);
+
+            try {
+                const res = await fetch('http://localhost:8000/analyze', { method: 'POST', body: formData });
+                const snapshots = await res.json();
+                renderStaging(snapshots);
+            } catch (err) {
+                console.error(err);
+                alert("Error connecting to backend");
+            } finally {
+                uploadBtn.textContent = "Analyze Batch";
+                uploadBtn.disabled = false;
+            }
+        });
+
+        // 2. Clear All Staging
+        clearBtn.addEventListener('click', () => {
+            stagingGrid.innerHTML = '';
+            fileInput.value = '';
+        });
+
+        // 3. Render Staging Cards
+        function renderStaging(items) {
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                // Store URLs in data attributes
+                card.dataset.crop = item.crop_url;
+                card.dataset.orig = item.original_url;
+                card.dataset.current = item.crop_url; // Default to crop
+
+                card.innerHTML = `
+                    <div class="img-frame">
+                        <img src="${item.crop_url}" id="img-${item.temp_id}">
+                    </div>
+                    
+                    <div class="toggle-wrapper">
+                        <span>Show:</span>
+                        <button class="toggle-btn active" onclick="toggleImage(this, '${item.temp_id}', 'crop')">Crop</button>
+                        <button class="toggle-btn" onclick="toggleImage(this, '${item.temp_id}', 'orig')">Full</button>
+                    </div>
+
+                    <input type="text" id="lbl-${item.temp_id}" class="edit-input label-input" value="${item.label}">
+                    <input type="text" id="note-${item.temp_id}" class="edit-input note-input" placeholder="Add location note...">
+                    
+                    <button class="publish-btn" onclick="publishItem(this, '${item.temp_id}')">Publish</button>
+                `;
+                stagingGrid.appendChild(card);
+            });
+        }
+
+        // 4. Toggle Image Logic
+        window.toggleImage = function(btn, id, type) {
+            const card = btn.closest('.item-card');
+            const img = document.getElementById(`img-${id}`);
+            const btns = card.querySelectorAll('.toggle-btn');
+            
+            // Update buttons visual state
+            btns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Update Image Source & Data State
+            if(type === 'crop') {
+                img.src = card.dataset.crop;
+                card.dataset.current = card.dataset.crop;
+            } else {
+                img.src = card.dataset.orig;
+                card.dataset.current = card.dataset.orig;
+            }
+        }
+
+        // 5. Publish Item
+        window.publishItem = async function(btn, tempId) {
+            const card = btn.closest('.item-card');
+            const labelVal = document.getElementById(`lbl-${tempId}`).value;
+            const noteVal = document.getElementById(`note-${tempId}`).value;
+            const finalUrl = card.dataset.current; // Gets whichever is currently selected
+
+            try {
+                await fetch('http://localhost:8000/publish', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        label: labelVal,
+                        note: noteVal || "No details",
+                        image_url: finalUrl,
+                        date: new Date().toLocaleDateString()
+                    })
+                });
+                btn.innerHTML = "✓ Published";
+                btn.classList.add("btn-success");
+                loadPublishedItems(); // Refresh list
+            } catch (err) { alert("Failed to publish"); }
+        }
+
+        // 6. Manage Published Items (Load & Delete)
+        async function loadPublishedItems() {
+            const res = await fetch('http://localhost:8000/items');
+            const items = await res.json();
+            publishedGrid.innerHTML = '';
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.innerHTML = `
+                    <div class="img-frame" style="height: 150px;">
+                        <img src="${item.image_url}">
+                    </div>
+                    <div class="card-label">${item.label}</div>
+                    <div class="card-note">${item.note}</div>
+                    <button class="action-btn delete-btn" onclick="deleteItem('${item.id}')">Delete</button>
+                `;
+                publishedGrid.appendChild(card);
+            });
+        }
+
+        window.deleteItem = async function(id) {
+            if(!confirm("Are you sure you want to remove this item?")) return;
+            await fetch(`http://localhost:8000/items/${id}`, { method: 'DELETE' });
+            loadPublishedItems();
+        }
+
+        // Initial Load
+        loadPublishedItems();
+    </script>
+</body>
+</html>

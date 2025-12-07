@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Colby Lost & Found</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* HEADER LAYOUT: Left (Title) vs Right (Contact) */
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start; /* Align to top */
+            margin-bottom: 30px;
+        }
+
+        .header-left {
+            max-width: 60%;
+        }
+
+        .header-right {
+            text-align: right;
+        }
+
+        .security-contact {
+            /* No Background Color */
+            background: transparent; 
+            padding: 0;
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        
+        .security-contact strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* --- NEW CSS FOR ACTIVE TAGS --- */
+        .tag-btn.active {
+            background-color: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <header class="header-flex">
+            <div class="header-left">
+                <h1>Colby Lost & Found</h1>
+                <p class="subtitle">Search for items or select multiple tags below.</p>
+            </div>
+            
+            <div class="header-right">
+                <div class="security-contact">
+                    <div>📍 Location: <strong>128 Roberts</strong></div>
+                    <div>📞 Phone: <strong>207-859-5530</strong></div>
+                </div>
+            </div>
+        </header>
+
+        <input type="text" id="searchInput" class="search-bar" placeholder="Type to search (e.g. 'Blue Wallet')...">
+
+        <div class="tag-container">
+            <button class="tag-btn" onclick="toggleTag(this, 'Phones')">Phones</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Jackets')">Jackets</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Glasses')">Glasses</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Airpods')">AirPods</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Scarf')">Scarf</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Cables')">Cables</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Watches')">Watches</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Bags')">Bags</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Wallets')">Wallets</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Card')">Card</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Car-keys')">Car Keys</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Backpack')">Backpack</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Laptops')">Laptops</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Keys')">Keys</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Powerbank')">Powerbank</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Colby Student Card')">Colby Card</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Tablets')">Tablets</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Chargers')">Chargers</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Smart-watches')">Smart Watches</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Vests')">Vests</button>
+            
+            <button class="tag-btn" onclick="toggleTag(this, 'Book')">Book</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Clock')">Clock</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Vase')">Vase</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Scissors')">Scissors</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Teddy Bear')">Teddy Bear</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Hair Drier')">Hair Drier</button>
+
+            <button class="tag-btn" onclick="toggleTag(this, 'Laptop')">Laptop</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Mouse')">Mouse</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Remote')">Remote</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Keyboard')">Keyboard</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Cell Phone')">Cell Phone</button>
+
+            <button class="tag-btn" onclick="toggleTag(this, 'Bottle')">Bottle</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Wine Glass')">Wine Glass</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Cup')">Cup</button>
+
+            <button class="tag-btn" onclick="toggleTag(this, 'Frisbee')">Frisbee</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Skis')">Skis</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Snowboard')">Snowboard</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Sports Ball')">Sports Ball</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Kite')">Kite</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Baseball Bat')">Baseball Bat</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Baseball Glove')">Baseball Glove</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Skateboard')">Skateboard</button>
+
+            <button class="tag-btn" onclick="toggleTag(this, 'Umbrella')">Umbrella</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Handbag')">Handbag</button>
+            <button class="tag-btn" onclick="toggleTag(this, 'Tie')">Tie</button>
+
+            <button class="tag-btn" onclick="resetFilters()" style="border-color: var(--accent); color: var(--accent);">Show All / Reset</button>
+        </div>
+
+        <div id="resultsGrid" class="grid"></div>
+    </div>
+
+    <script>
+        let allItems = [];
+        // Tracks currently selected tags
+        let selectedTags = new Set(); 
+
+        // 1. Fetch Items
+        fetch('http://localhost:8000/items')
+            .then(res => res.json())
+            .then(data => {
+                allItems = data;
+                renderItems(allItems);
+            });
+
+        function renderItems(items) {
+            const grid = document.getElementById('resultsGrid');
+            grid.innerHTML = '';
+            
+            if (items.length === 0) {
+                // Optional: Show a "No Items Found" message if filters are too strict
+                grid.innerHTML = '<p style="color:#888; width:100%; text-align:center;">No items match your criteria.</p>';
+                return;
+            }
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.innerHTML = `
+                    <div class="img-frame">
+                        <img src="${item.image_url}" loading="lazy">
+                    </div>
+                    <div class="card-label">${item.label}</div>
+                    <div class="card-note">${item.note}</div>
+                    <div class="card-date">${item.date}</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // 2. Event Listeners
+        document.getElementById('searchInput').addEventListener('input', () => {
+            applyFilters();
+        });
+
+        // 3. Toggle Tag Function (Multi-select)
+        function toggleTag(btn, tag) {
+            const lowerTag = tag.toLowerCase();
+
+            if (selectedTags.has(lowerTag)) {
+                // If already selected, remove it and un-style button
+                selectedTags.delete(lowerTag);
+                btn.classList.remove('active');
+            } else {
+                // If not selected, add it and style button
+                selectedTags.add(lowerTag);
+                btn.classList.add('active');
+            }
+            
+            applyFilters();
+        }
+
+        // 4. Reset Filters (Show All)
+        function resetFilters() {
+            selectedTags.clear();
+            document.getElementById('searchInput').value = '';
+            
+            // Remove 'active' class from all buttons
+            document.querySelectorAll('.tag-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            applyFilters();
+        }
+
+        // 5. Main Filter Logic
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            const filtered = allItems.filter(item => {
+                const itemLabel = item.label.toLowerCase();
+                const itemNote = item.note.toLowerCase();
+
+                // 1. Check Text Search match
+                const matchesSearch = itemLabel.includes(searchTerm) || itemNote.includes(searchTerm);
+
+                // 2. Check Tag match
+                // If NO tags are selected, everything passes this check.
+                // If tags ARE selected, the item label must match ONE of the selected tags.
+                let matchesTags = true;
+                if (selectedTags.size > 0) {
+                    matchesTags = selectedTags.has(itemLabel);
+                }
+
+                return matchesSearch && matchesTags;
+            });
+
+            // If user has filters active but no results, show empty (renderItems handles 0 length).
+            // If user has NO filters active (init state), show all.
+            if (filtered.length === 0 && selectedTags.size === 0 && searchTerm === '') {
+                 renderItems(allItems);
+            } else {
+                 renderItems(filtered);
+            }
+        }
+    </script>
+</body>
+</html>
